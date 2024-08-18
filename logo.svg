@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200">
+  <defs>
+    <linearGradient id="pinkPurpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF4081" />
+      <stop offset="100%" style="stop-color:#9C27B0" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Three Triangles -->
+  <path d="M75,40 125,120 25,120 Z" fill="#FF4081" />
+  <path d="M150,40 200,120 100,120 Z" fill="#AB47BC" />
+  <path d="M225,40 275,120 175,120 Z" fill="#9C27B0" />
+  
+  <!-- Stylish "VALLEY TECH" text -->
+  <text x="150" y="180" font-family="Futura, sans-serif" font-size="32" font-weight="bold" fill="#333333" text-anchor="middle">VALLEY TECH</text>
+</svg>

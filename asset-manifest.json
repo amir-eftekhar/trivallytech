@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/trivallytech/static/css/main.269a956a.css",
+    "main.js": "/trivallytech/static/js/main.fce25ae2.js",
+    "static/js/453.d00d43a5.chunk.js": "/trivallytech/static/js/453.d00d43a5.chunk.js",
+    "index.html": "/trivallytech/index.html",
+    "static/media/shortcut.svg": "/trivallytech/static/media/shortcut.9bd9f245bffae5690af2707ccfcd852a.svg",
+    "static/media/sand.svg": "/trivallytech/static/media/sand.cc7c677b9ad230ffe2a5cbc940589abc.svg",
+    "static/media/spell.svg": "/trivallytech/static/media/spell.cc4dcb70656bb6a46b9bf17c8fb270bf.svg",
+    "static/media/logo2.svg": "/trivallytech/static/media/logo2.cf14132e6cfbd5630cb0365156398a21.svg",
+    "static/media/ai-agent.svg": "/trivallytech/static/media/ai-agent.d12b980bb60194ea8a96f1e62ae427e5.svg",
+    "static/media/tutoring.svg": "/trivallytech/static/media/tutoring.8e50e33ca2eca2eaefdb536f49f638e9.svg",
+    "static/media/legal.svg": "/trivallytech/static/media/legal.b1b2c850363384750a44fcf435c6daab.svg",
+    "static/media/shower.svg": "/trivallytech/static/media/shower.db5cff013fed72fd317525e887709080.svg",
+    "static/media/leg.svg": "/trivallytech/static/media/leg.960c06adb201d273380f2dbf58dfb5bd.svg",
+    "main.269a956a.css.map": "/trivallytech/static/css/main.269a956a.css.map",
+    "main.fce25ae2.js.map": "/trivallytech/static/js/main.fce25ae2.js.map",
+    "453.d00d43a5.chunk.js.map": "/trivallytech/static/js/453.d00d43a5.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.269a956a.css",
+    "static/js/main.fce25ae2.js"
+  ]
+}
