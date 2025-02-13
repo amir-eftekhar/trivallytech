@@ -1,0 +1,25 @@
+{
+  "short_name": "TrivallyTech",
+  "name": "Tri-Valley Tech is a nonprofit organization dedicated to empowering high school students to create real-world impact through innovative projects. We believe that today's students have the potential to solve many of the challenges we face in our communities and beyond",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
