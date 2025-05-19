@@ -84,6 +84,7 @@ const Header = () => {
     { name: 'Impact', icon: <BarChart size={20} />, to: '/#impact', onClick: () => scrollToSection('impact') },
     { name: 'Articles', icon: <FileText size={20} />, to: '/articles' },
     { name: 'Team', icon: <Users size={20} />, to: '/team' },
+    { name: 'Dev Vault', icon: <Code size={20} />, to: '/dev-vault' },
     { name: 'Contact', icon: <MessageCircle size={20} />, to: '/#contact', onClick: () => scrollToSection('contact') },
   ];
 

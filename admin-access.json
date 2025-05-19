@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "token": "tvtech-admin-2024-secure-token-xyz123",
+  "expires_at": "2025-12-31T23:59:59Z",
+  "instructions": [
+    "1. Save this file securely on your device",
+    "2. Open the website in your browser",
+    "3. Open the browser's developer tools (F12 or right-click -> Inspect)",
+    "4. Go to the Console tab",
+    "5. Copy and paste the following command:",
+    "localStorage.setItem('adminToken', 'tvtech-admin-2024-secure-token-xyz123')",
+    "6. Refresh the page to gain admin access",
+    "7. To remove admin access, use: localStorage.removeItem('adminToken')"
+  ],
+  "security_notes": [
+    "Keep this file secure and do not share it",
+    "The token will expire on December 31, 2025",
+    "Contact the system administrator for a new token if needed",
+    "Do not store this file on public or shared computers",
+    "Delete this file after setting up your access"
+  ]
+} 
