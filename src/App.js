@@ -14,6 +14,13 @@ import OfficersPage from './OfficersPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
+     if (sessionStorage.redirect) {
+      var redirect = sessionStorage.redirect;
+      sessionStorage.removeItem('redirect');
+      if (redirect && redirect !== "/" && redirect !== "/index.html") {
+        window.history.replaceState(null, null, redirect);
+      }
+    }
   return (
     <ThemeProvider>
       <Router>
