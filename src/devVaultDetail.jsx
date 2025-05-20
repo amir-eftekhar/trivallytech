@@ -77,60 +77,13 @@ const DevVaultDetail = () => {
 
           {/* Project Hero */}
           <div className="relative rounded-2xl overflow-hidden mb-8">
-            <div className="h-64 md:h-80 w-full overflow-hidden">
+            <div className="h-96 md:h-[32rem] w-full overflow-hidden">
               <img 
                 src={project.image_base64 || project.image || 'https://via.placeholder.com/400x200?text=No+Image'} 
                 alt={project.title} 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover brightness-110 contrast-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20"></div>
-            </div>
-            
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-              <div className="flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <span className="inline-block px-3 py-1 bg-[var(--accent-primary)] text-white text-xs font-semibold rounded-full mb-4">
-                    {project.status}
-                  </span>
-                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                    {project.title}
-                  </h1>
-                  <p className="text-white/80 text-lg max-w-3xl">
-                    {project.description}
-                  </p>
-                </div>
-                
-                <div className="flex space-x-4">
-                  <a 
-                    href={project.github} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-3 bg-black/30 backdrop-blur-sm rounded-full text-white hover:bg-[var(--accent-primary)]/80 transition-colors"
-                  >
-                    <Github size={20} />
-                  </a>
-                  {project.website && (
-                    <a 
-                      href={project.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-3 bg-black/30 backdrop-blur-sm rounded-full text-white hover:bg-[var(--accent-primary)]/80 transition-colors"
-                    >
-                      <ExternalLink size={20} />
-                    </a>
-                  )}
-                  {project.documentation && (
-                    <a 
-                      href={project.documentation} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-3 bg-black/30 backdrop-blur-sm rounded-full text-white hover:bg-[var(--accent-primary)]/80 transition-colors"
-                    >
-                      <FileText size={20} />
-                    </a>
-                  )}
-                </div>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/10 pointer-events-none"></div>
             </div>
           </div>
 
@@ -139,14 +92,18 @@ const DevVaultDetail = () => {
             <div>
               <h3 className="text-sm font-medium text-[var(--text-secondary)] mb-2">Technologies</h3>
               <div className="flex flex-wrap gap-2">
-                {((project.tech || [])).map((tech, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full text-xs font-medium"
-                  >
-                    {tech}
-                  </span>
-                ))}
+                {(project.tech || []).length === 0 ? (
+                  <span className="text-xs text-[var(--text-secondary)] italic">No technologies listed</span>
+                ) : (
+                  (project.tech || []).map((tech, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full text-xs font-medium"
+                    >
+                      {tech}
+                    </span>
+                  ))
+                )}
               </div>
             </div>
             
@@ -180,6 +137,21 @@ const DevVaultDetail = () => {
                 })}</span>
               </div>
             </div>
+          </div>
+
+          {/* Project Title and Overview */}
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              {project.title}
+            </h1>
+            {project.description && (
+              <div className="prose prose-lg max-w-none text-[var(--text-secondary)]">
+                <h2 className="text-xl font-bold mb-2">Description</h2>
+                {project.description.split('\n').map((paragraph, index) => (
+                  paragraph.trim() ? <p key={index} className="mb-4">{paragraph.trim()}</p> : null
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Tabs */}
@@ -280,12 +252,9 @@ const DevVaultDetail = () => {
                       <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                         <img 
                           src={screenshot.url} 
-                          alt={screenshot.caption} 
+                          alt={project.title + ' screenshot'} 
                           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                         />
-                      </div>
-                      <div className="p-4 bg-[var(--bg-primary)]">
-                        <p className="text-sm text-[var(--text-secondary)]">{screenshot.caption}</p>
                       </div>
                     </div>
                   ))}
