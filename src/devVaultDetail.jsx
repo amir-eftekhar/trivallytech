@@ -4,17 +4,38 @@ import { useParams, Link } from 'react-router-dom';
 import { Header, Footer } from './page.jsx';
 import { Github, ExternalLink, Users, Calendar, ArrowLeft, FileText, Code, Info, MessageCircle, Link as LinkIcon } from 'lucide-react';
 import projects from './data/projects';
+import { projectsApi } from './lib/supabase';
 
 const DevVaultDetail = () => {
   const { projectId } = useParams();
   const [activeTab, setActiveTab] = useState('overview');
   const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Find the project with the matching ID
-    const foundProject = projects.find(p => p.id === projectId);
-    setProject(foundProject);
+    const fetchProject = async () => {
+      // Try to fetch from API first
+      let foundProject = null;
+      try {
+        const data = await projectsApi.getProjects();
+        foundProject = (data || []).find(p => p.id === projectId);
+      } catch (e) {
+        // fallback to static
+        foundProject = projects.find(p => p.id === projectId);
+      }
+      setProject(foundProject);
+      setLoading(false);
+    };
+    fetchProject();
   }, [projectId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--accent-primary)]"></div>
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -58,7 +79,7 @@ const DevVaultDetail = () => {
           <div className="relative rounded-2xl overflow-hidden mb-8">
             <div className="h-64 md:h-80 w-full overflow-hidden">
               <img 
-                src={project.image} 
+                src={project.image_base64 || project.image || 'https://via.placeholder.com/400x200?text=No+Image'} 
                 alt={project.title} 
                 className="w-full h-full object-cover"
               />
@@ -118,7 +139,7 @@ const DevVaultDetail = () => {
             <div>
               <h3 className="text-sm font-medium text-[var(--text-secondary)] mb-2">Technologies</h3>
               <div className="flex flex-wrap gap-2">
-                {project.tech.map((tech, index) => (
+                {((project.tech || [])).map((tech, index) => (
                   <span
                     key={index}
                     className="px-3 py-1 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full text-xs font-medium"
@@ -132,7 +153,7 @@ const DevVaultDetail = () => {
             <div>
               <h3 className="text-sm font-medium text-[var(--text-secondary)] mb-2">Contributors</h3>
               <div className="flex -space-x-2 overflow-hidden">
-                {project.contributors.map((contributor, index) => (
+                {((project.contributors || [])).map((contributor, index) => (
                   <div 
                     key={index}
                     className="inline-block h-8 w-8 rounded-full ring-2 ring-[var(--bg-primary)]"

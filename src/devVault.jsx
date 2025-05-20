@@ -152,7 +152,7 @@ const DevVaultPage = () => {
                       {/* Project Image */}
                       <div className="h-56 overflow-hidden relative">
                         <img 
-                          src={project.image} 
+                          src={project.image_base64 || project.image || 'https://via.placeholder.com/400x200?text=No+Image'} 
                           alt={project.title} 
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
@@ -176,7 +176,7 @@ const DevVaultPage = () => {
                         {/* Tech Tags */}
                         <div className="mb-4">
                           <div className="flex flex-wrap gap-2">
-                            {project.tech.slice(0, 3).map((tech, index) => (
+                            {(project.tech || []).slice(0, 3).map((tech, index) => (
                               <span
                                 key={index}
                                 className="px-3 py-1 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full text-xs font-medium"
@@ -184,9 +184,9 @@ const DevVaultPage = () => {
                                 {tech}
                               </span>
                             ))}
-                            {project.tech.length > 3 && (
+                            {(project.tech || []).length > 3 && (
                               <span className="px-3 py-1 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-full text-xs font-medium">
-                                +{project.tech.length - 3}
+                                +{(project.tech || []).length - 3}
                               </span>
                             )}
                           </div>
@@ -196,7 +196,7 @@ const DevVaultPage = () => {
                         <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
                           <div className="flex items-center">
                             <Users size={14} className="mr-1" />
-                            <span>{project.contributors.length} contributors</span>
+                            <span>{(project.contributors || []).length} contributors</span>
                           </div>
                           <div className="flex items-center">
                             <Calendar size={14} className="mr-1" />

@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const crypto = require('crypto');
 require('dotenv').config();
 
 // Initialize Supabase client
@@ -14,25 +15,19 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Function to generate a secure token
 const generateSecureToken = () => {
-  const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return crypto.randomBytes(32).toString('hex');
 };
 
 // Function to hash the token
-const hashToken = async (token) => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(token);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+const hashToken = (token) => {
+  return crypto.createHash('sha256').update(token).digest('hex');
 };
 
 // Function to create a new admin token
 const createAdminToken = async (expiresInDays = 365) => {
   try {
     const token = generateSecureToken();
-    const hashedToken = await hashToken(token);
+    const hashedToken = hashToken(token);
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + expiresInDays);
 

@@ -1,10 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Header, Footer } from './page.jsx';
 import { ArrowLeft, Plus, X, Upload, Check, AlertCircle, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
 import projects from './data/projects';
 import { supabase } from './lib/supabase';
+
+const FALLBACK_IMAGES = {
+  avatar: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0em0wIDJjLTIuNjcgMC04IDEuMzQtOCA0djJoMTZ2LTJjMC0yLjY2LTUuMzMtNC04LTR6IiBmaWxsPSIjNjY2Ii8+PC9zdmc+',
+  image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xOSAzSDVjLTEuMSAwLTIgLjktMiAydjE0YzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNWMwLTEuMS0uOS0yLTItMnptMCAxNkg1VjVoMTR2MTR6bS01LTdjLS44MyAwLTEuNS0uNjctMS41LTEuNVMxMy4xNyA5IDEyIDlzLTEuNS42Ny0xLjUgMS41UzExLjE3IDEyIDEyIDEyczEuNS0uNjcgMS41LTEuNVMxMi44MyA5IDEyIDl6bS0zIDVoNnYtLjA0YzAtLjI4LS4yMi0uNS0uNS0uNWgtNWMtLjI4IDAtLjUuMjItLjUuNVYxNHoiIGZpbGw9IiM2NjYiLz48L3N2Zz4='
+};
 
 const ImageUploadField = ({ 
   value, 
@@ -17,7 +22,13 @@ const ImageUploadField = ({
   previewClassName = "h-48"
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(value || FALLBACK_IMAGES.image);
   const fileInputRef = useRef(null);
+
+  // Update preview when value changes
+  useEffect(() => {
+    setPreviewUrl(value || FALLBACK_IMAGES.image);
+  }, [value]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -34,8 +45,24 @@ const ImageUploadField = ({
     setIsDragging(false);
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
-      onUpload({ target: { files } });
+      handleFileSelect(files[0]);
     }
+  };
+
+  const handleFileSelect = (file) => {
+    if (file) {
+      // Create a preview URL
+      const preview = URL.createObjectURL(file);
+      setPreviewUrl(preview);
+      // Call the upload handler
+      onUpload({ target: { files: [file] } });
+    }
+  };
+
+  const handleUrlChange = (e) => {
+    const url = e.target.value;
+    setPreviewUrl(url || FALLBACK_IMAGES.image);
+    onChange(e);
   };
 
   return (
@@ -47,7 +74,7 @@ const ImageUploadField = ({
         <input
           type="text"
           value={value}
-          onChange={onChange}
+          onChange={handleUrlChange}
           placeholder="Enter image URL or upload a file"
           className={`w-full px-4 py-2.5 rounded-lg bg-[var(--bg-primary)] border ${
             error ? 'border-red-500' : 'border-[var(--accent-primary)]/20'
@@ -60,7 +87,7 @@ const ImageUploadField = ({
               ref={fileInputRef}
               type="file"
               accept="image/*"
-              onChange={onUpload}
+              onChange={(e) => handleFileSelect(e.target.files[0])}
               className="hidden"
             />
           </label>
@@ -71,28 +98,28 @@ const ImageUploadField = ({
           <AlertCircle size={14} className="mr-1" /> {error}
         </p>
       )}
-      {value && (
-        <div className="mt-4 p-4 border border-[var(--accent-primary)]/20 rounded-lg">
-          <div className="relative group">
-            <img 
-              src={value} 
-              alt="Preview" 
-              className={`w-full ${previewClassName} object-cover rounded-lg`}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/400x200?text=Image+Not+Found';
-              }}
-            />
+      <div className="mt-4 p-4 border border-[var(--accent-primary)]/20 rounded-lg">
+        <div className="relative group">
+          <img 
+            src={previewUrl} 
+            alt="Preview" 
+            className={`w-full ${previewClassName} object-cover rounded-lg`}
+            onError={() => setPreviewUrl(FALLBACK_IMAGES.image)}
+          />
+          {value && (
             <button
               type="button"
-              onClick={() => onChange({ target: { value: '' } })}
+              onClick={() => {
+                setPreviewUrl(FALLBACK_IMAGES.image);
+                onChange({ target: { value: '' } });
+              }}
               className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <X size={20} />
             </button>
-          </div>
+          )}
         </div>
-      )}
+      </div>
       <div
         className={`mt-4 border-2 border-dashed rounded-lg p-6 transition-colors relative ${
           isDragging 
@@ -111,7 +138,7 @@ const ImageUploadField = ({
             <input
               type="file"
               accept="image/*"
-              onChange={onUpload}
+              onChange={(e) => handleFileSelect(e.target.files[0])}
               className="hidden"
             />
           </label>
@@ -128,9 +155,29 @@ const AvatarUploadField = ({
   error, 
   label, 
   required = false,
-  className = ""
+  className = "",
+  contributorIndex = null
 }) => {
+  const [previewUrl, setPreviewUrl] = useState(value || FALLBACK_IMAGES.avatar);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setPreviewUrl(value || FALLBACK_IMAGES.avatar);
+  }, [value]);
+
+  const handleFileSelect = (file) => {
+    if (file) {
+      const preview = URL.createObjectURL(file);
+      setPreviewUrl(preview);
+      onUpload({ target: { files: [file] } }, contributorIndex);
+    }
+  };
+
+  const handleUrlChange = (e) => {
+    const url = e.target.value;
+    setPreviewUrl(url || FALLBACK_IMAGES.avatar);
+    onChange(e);
+  };
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -140,18 +187,18 @@ const AvatarUploadField = ({
       <div className="flex items-center gap-4">
         <div className="relative w-16 h-16 group">
           <img 
-            src={value || 'https://via.placeholder.com/64?text=Avatar'} 
+            src={previewUrl} 
             alt="Avatar" 
             className="w-full h-full rounded-full object-cover border-2 border-[var(--accent-primary)]/20"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'https://via.placeholder.com/64?text=Avatar';
-            }}
+            onError={() => setPreviewUrl(FALLBACK_IMAGES.avatar)}
           />
           {value && (
             <button
               type="button"
-              onClick={() => onChange({ target: { value: '' } })}
+              onClick={() => {
+                setPreviewUrl(FALLBACK_IMAGES.avatar);
+                onChange({ target: { value: '' } });
+              }}
               className="absolute -top-1 -right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <X size={14} />
@@ -161,7 +208,7 @@ const AvatarUploadField = ({
             <input
               type="file"
               accept="image/*"
-              onChange={onUpload}
+              onChange={(e) => handleFileSelect(e.target.files[0])}
               className="hidden"
             />
           </label>
@@ -171,7 +218,7 @@ const AvatarUploadField = ({
             <input
               type="text"
               value={value}
-              onChange={onChange}
+              onChange={handleUrlChange}
               placeholder="Enter avatar URL or upload a file"
               className={`w-full px-4 py-2.5 rounded-lg bg-[var(--bg-primary)] border ${
                 error ? 'border-red-500' : 'border-[var(--accent-primary)]/20'
@@ -184,7 +231,7 @@ const AvatarUploadField = ({
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  onChange={onUpload}
+                  onChange={(e) => handleFileSelect(e.target.files[0])}
                   className="hidden"
                 />
               </label>
@@ -201,6 +248,16 @@ const AvatarUploadField = ({
   );
 };
 
+// Add this utility function at the top (after imports)
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 const DevVaultCreate = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -209,18 +266,20 @@ const DevVaultCreate = () => {
     description: '',
     shortDescription: '',
     image: '',
+    imageFile: null,
     tech: [''],
     category: '',
     customCategory: '',
     github: '',
     website: '',
     documentation: '',
-    contributors: [{ name: '', role: '', avatar: '' }],
+    contributors: [{ name: '', role: '', avatar: '', avatarFile: null }],
     date: new Date().toISOString().split('T')[0],
     status: 'Planning Phase',
     overview: '',
     features: [''],
-    screenshots: [{ url: '', caption: '' }]
+    screenshots: [{ url: '', caption: '' }],
+    screenshotFiles: []
   });
   
   const [errors, setErrors] = useState({});
@@ -352,7 +411,7 @@ const DevVaultCreate = () => {
   const addContributor = () => {
     setFormData(prev => ({
       ...prev,
-      contributors: [...prev.contributors, { name: '', role: '', avatar: '' }]
+      contributors: [...prev.contributors, { name: '', role: '', avatar: '', avatarFile: null }]
     }));
   };
 
@@ -361,7 +420,7 @@ const DevVaultCreate = () => {
     newContributors.splice(index, 1);
     setFormData(prev => ({
       ...prev,
-      contributors: newContributors.length ? newContributors : [{ name: '', role: '', avatar: '' }]
+      contributors: newContributors.length ? newContributors : [{ name: '', role: '', avatar: '', avatarFile: null }]
     }));
   };
 
@@ -393,61 +452,42 @@ const DevVaultCreate = () => {
     }));
   };
 
-  const handleImageUpload = async (e, type = 'main') => {
+  // Update handleImageUpload to use base64
+  const handleImageUpload = async (e, type = 'main', contributorIndex = null) => {
     try {
       setUploading(true);
       const files = Array.from(e.target.files);
-      
-      const uploadPromises = files.map(async (file) => {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `${fileName}`;
-
-        const bucket = type === 'avatar' ? 'avatars' : 
-                      type === 'main' ? 'project-images' : 
-                      'project-screenshots';
-
-        const { error: uploadError, data } = await supabase.storage
-          .from(bucket)
-          .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from(bucket)
-          .getPublicUrl(filePath);
-
-        return { url: publicUrl, caption: file.name };
-      });
-
-      const results = await Promise.all(uploadPromises);
-      
+      if (files.length === 0) return;
+      const file = files[0];
+      const base64 = await fileToBase64(file);
       if (type === 'main') {
         setFormData(prev => ({
           ...prev,
-          image: results[0].url
+          image: base64, // Store base64 string
+          imageFile: null // Clear file object
         }));
-      } else if (type === 'avatar') {
-        // Update the avatar URL in the form data
-        const contributorIndex = e.target.dataset.contributorIndex;
-        if (contributorIndex !== undefined) {
-          setFormData(prev => ({
-            ...prev,
-            contributors: prev.contributors.map((c, i) => 
-              i === parseInt(contributorIndex) 
-                ? { ...c, avatar: results[0].url }
-                : c
-            )
-          }));
-        }
-      } else {
+      } else if (type === 'avatar' && contributorIndex !== null) {
         setFormData(prev => ({
           ...prev,
-          screenshots: [...prev.screenshots, ...results]
+          contributors: prev.contributors.map((c, i) =>
+            i === contributorIndex
+              ? { ...c, avatar: base64, avatarFile: null }
+              : c
+          )
+        }));
+      } else if (type === 'screenshots') {
+        setFormData(prev => ({
+          ...prev,
+          screenshots: [
+            ...(prev.screenshots || []),
+            { url: base64, caption: file.name }
+          ],
+          screenshotFiles: []
         }));
       }
     } catch (error) {
-      setError(`Error uploading ${type === 'main' ? 'image' : 'screenshots'}: ${error.message}`);
+      console.error('Error handling image:', error);
+      setError(`Error handling image: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -461,7 +501,7 @@ const DevVaultCreate = () => {
     if (!formData.title) newErrors.title = 'Title is required';
     if (!formData.description) newErrors.description = 'Description is required';
     if (!formData.shortDescription) newErrors.shortDescription = 'Short description is required';
-    if (!formData.image) newErrors.image = 'Image URL is required';
+    if (!formData.image && !formData.imageFile) newErrors.image = 'Image is required (URL or file upload)';
     if (!formData.overview) newErrors.overview = 'Overview is required';
     if (!formData.github) newErrors.github = 'GitHub URL is required';
     
@@ -489,18 +529,20 @@ const DevVaultCreate = () => {
     if (validContributors.length === 0) newErrors.contributors = 'At least one contributor is required';
     
     // Validate screenshots
-    const validScreenshots = formData.screenshots.filter(s => s.url.trim() !== '' && s.caption.trim() !== '');
-    if (validScreenshots.length === 0) newErrors.screenshots = 'At least one screenshot is required';
+    const validScreenshots = formData.screenshots.filter(s => s.url.trim() !== '');
+    const hasScreenshotFiles = formData.screenshotFiles && formData.screenshotFiles.length > 0;
+    if (validScreenshots.length === 0 && !hasScreenshotFiles) {
+      newErrors.screenshots = 'At least one screenshot is required (URL or file upload)';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // Update handleSubmit to skip all uploadFile logic and just save base64 strings
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) {
-      // Scroll to the first error
       const firstErrorField = Object.keys(errors)[0];
       const errorElement = document.getElementById(firstErrorField);
       if (errorElement) {
@@ -508,18 +550,14 @@ const DevVaultCreate = () => {
       }
       return;
     }
-    
     setIsSubmitting(true);
-    
+    setError(null);
     try {
       setUploading(true);
-      
-      // Handle custom category
       let finalCategory = formData.category;
       if (formData.category === 'custom' && formData.customCategory.trim()) {
         finalCategory = formData.customCategory.trim().toLowerCase();
       }
-      
       // Clean up empty fields
       const cleanedData = {
         ...formData,
@@ -529,30 +567,39 @@ const DevVaultCreate = () => {
         contributors: formData.contributors.filter(c => c.name.trim() !== ''),
         screenshots: formData.screenshots.filter(s => s.url.trim() !== '')
       };
-      
       const { data, error } = await supabase
         .from('projects')
         .insert([
           {
+            id: cleanedData.id,
             title: cleanedData.title,
             description: cleanedData.description,
-            technologies: cleanedData.tech.join(','),
+            short_description: cleanedData.shortDescription,
+            image_base64: cleanedData.image, // Save base64 string
+            technologies: cleanedData.tech,
+            category: cleanedData.category,
             github_link: cleanedData.github,
-            live_link: cleanedData.website,
-            screenshots: cleanedData.screenshots.map(s => s.url)
+            website_link: cleanedData.website,
+            documentation_link: cleanedData.documentation,
+            contributors: cleanedData.contributors,
+            date: cleanedData.date,
+            status: cleanedData.status,
+            overview: cleanedData.overview,
+            features: cleanedData.features,
+            screenshots: cleanedData.screenshots,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           }
-        ]);
-
+        ])
+        .select()
+        .single();
       if (error) throw error;
-      
       setSuccessMessage('Project created successfully!');
-      
-      // In a real app, you would update your projects list here
-      // For now, we'll just navigate back after a delay
       setTimeout(() => {
         navigate('/dev-vault');
       }, 2000);
     } catch (error) {
+      console.error('Error creating project:', error);
       setError('Error creating project: ' + error.message);
     } finally {
       setIsSubmitting(false);
@@ -569,18 +616,20 @@ const DevVaultCreate = () => {
         description: '',
         shortDescription: '',
         image: '',
+        imageFile: null,
         tech: [''],
         category: '',
         customCategory: '',
         github: '',
         website: '',
         documentation: '',
-        contributors: [{ name: '', role: '', avatar: '' }],
+        contributors: [{ name: '', role: '', avatar: '', avatarFile: null }],
         date: new Date().toISOString().split('T')[0],
         status: 'Planning Phase',
         overview: '',
         features: [''],
-        screenshots: [{ url: '', caption: '' }]
+        screenshots: [{ url: '', caption: '' }],
+        screenshotFiles: []
       });
       setErrors({});
     }
@@ -1061,7 +1110,8 @@ const DevVaultCreate = () => {
                           label="Avatar"
                           value={contributor.avatar}
                           onChange={(e) => handleContributorChange(index, 'avatar', e.target.value)}
-                          onUpload={(e) => handleImageUpload(e, 'avatar')}
+                          onUpload={(e) => handleImageUpload(e, 'avatar', index)}
+                          contributorIndex={index}
                         />
                       </div>
                     </div>
